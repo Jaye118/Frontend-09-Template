@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta http-equiv="X-UA-Compatible" content="ie=edge">
+  <title>TicTacToe</title>
+  <style>
+    .cell {
+      width: 100px;
+      height: 100px;
+      background-color: green;
+      display: inline-block;
+      vertical-align: middle;
+      border: 1px solid white;
+
+      line-height: 100px;
+      font-size: 50px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <h2>游戏说明</h2>
+  <p>* 棋盘：3*3 方格 -> 二维数组</p>
+  <p>* 双方分别持有 ⭕️ 和 ❌ </p>
+  <p>* 双方交替落子</p>
+  <p>* 率先连成三子直线的一方获胜</p>
+  <br>
+
+  <div id="board"></div>
+
+  <script>
+    let pattern = [
+      [0, 0, 0],
+      [0, 0, 0],
+      [0, 0, 0],
+    ];
+
+    let color = 1;
+
+    function show () {
+      let board = document.getElementById('board');
+      board.innerText = '';
+
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          let cell = document.createElement('div');
+          cell.classList.add('cell')
+          cell.innerText =
+            pattern[i][j] == 2 ? '❌' :
+            pattern[i][j] == 1 ? '⭕️' : '';
+          cell.addEventListener('click', () => move(j, i))
+          board.appendChild(cell);
+        }
+        board.appendChild(document.createElement('br'))
+      }
+    }
+
+    function move (x, y) {
+      pattern[y][x] = color;
+      if(check(pattern, color)) {
+        alert(color == 2 ? '❌ is winner!' : '⭕️ is winner!');
+      }
+      color = 3 - color; // 让 color 1 变 2，2 变 1
+      show()
+      // 检查是否要赢
+      if (willWin(pattern, color)) {
+        console.log(color == 2 ? '❌ will winner!' : '⭕️ will winner!')
+      }
+    }
+
+    // 判断哪方要赢
+    function check (pattern, color) {
+      // 判断同一行是否三个子 color 相同
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[i][j] !== color) {
+            win = false
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+
+      // 判断同一列是否三个子 color 相同
+      for (let i = 0; i < 3; i++) {
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[j][i] !== color) {
+            win = false
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      {
+        // 判断右上->左下斜向：i + j = 2
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[j][2 - j] !== color) {
+            win = false
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      {
+        // 判断左上->右下斜向：横纵坐标都相等
+        let win = true;
+        for (let j = 0; j < 3; j++) {
+          if (pattern[j][j] !== color) {
+            win = false
+          }
+        }
+        if (win) {
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function clone (pattern) {
+      return (JSON.parse(JSON.stringify(pattern)))
+    }
+
+    function willWin (pattern, color) {
+      for (let i = 0; i < 3; i++) {
+        for (let j = 0; j < 3; j++) {
+          // 当前位置有值则跳过
+          if (pattern[i][j]) {
+            continue;
+          }
+          // 当前位置没有值，则 clone pattern
+          let tmp = clone(pattern);
+          tmp[i][j] = color;
+          if (check(tmp, color)) {
+            return true; // 位置
+          }
+        }
+      }
+      return false;
+    }
+
+    show(pattern);
+  </script>
+</body>
+</html>
