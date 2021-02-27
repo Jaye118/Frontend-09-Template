@@ -31,25 +31,26 @@
   <div id="board"></div>
 
   <script>
+    // 一维数组
     let pattern = [
-      [0, 0, 2],
-      [0, 1, 0],
-      [0, 0, 0],
+      0, 0, 0,
+      0, 0, 0,
+      0, 0, 0,
     ];
 
     let color = 1;
 
     function show () {
       let board = document.getElementById('board');
-      board.innerText = '';
+      board.innerHTML = '';
 
       for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
           let cell = document.createElement('div');
           cell.classList.add('cell')
           cell.innerText =
-            pattern[i][j] == 2 ? '❌' :
-            pattern[i][j] == 1 ? '⭕️' : '';
+            pattern[i * 3 + j] == 2 ? '❌' :
+            pattern[i * 3 + j] == 1 ? '⭕️' : '';
           cell.addEventListener('click', () => move(j, i))
           board.appendChild(cell);
         }
@@ -58,16 +59,13 @@
     }
 
     function move (x, y) {
-      pattern[y][x] = color;
+      pattern[y * 3 + x] = color;
       if(check(pattern, color)) {
         alert(color == 2 ? '❌ is winner!' : '⭕️ is winner!');
       }
       color = 3 - color; // 让 color 1 变 2，2 变 1
+      console.log(bestChoice(pattern, color));
       show()
-      // 检查是否要赢
-      if (willWin(pattern, color)) {
-        console.log(color == 2 ? '❌ will winner!' : '⭕️ will winner!')
-      }
     }
 
     // 判断哪方要赢
@@ -76,7 +74,7 @@
       for (let i = 0; i < 3; i++) {
         let win = true;
         for (let j = 0; j < 3; j++) {
-          if (pattern[i][j] !== color) {
+          if (pattern[i * 3 + j] !== color) {
             win = false
           }
         }
@@ -89,7 +87,7 @@
       for (let i = 0; i < 3; i++) {
         let win = true;
         for (let j = 0; j < 3; j++) {
-          if (pattern[j][i] !== color) {
+          if (pattern[j * 3 + i] !== color) {
             win = false
           }
         }
@@ -101,7 +99,7 @@
         // 判断右上->左下斜向：i + j = 2
         let win = true;
         for (let j = 0; j < 3; j++) {
-          if (pattern[j][2 - j] !== color) {
+          if (pattern[j * 3 + 2 - j] !== color) {
             win = false
           }
         }
@@ -113,7 +111,7 @@
         // 判断左上->右下斜向：横纵坐标都相等
         let win = true;
         for (let j = 0; j < 3; j++) {
-          if (pattern[j][j] !== color) {
+          if (pattern[j * 3 + j] !== color) {
             win = false
           }
         }
@@ -125,19 +123,19 @@
     }
 
     function clone (pattern) {
-      return (JSON.parse(JSON.stringify(pattern)))
+      return Object.create(pattern);
     }
 
     function willWin (pattern, color) {
       for (let i = 0; i < 3; i++) {
         for (let j = 0; j < 3; j++) {
           // 当前位置有值则跳过
-          if (pattern[i][j]) {
+          if (pattern[i * 3 + j]) {
             continue;
           }
           // 当前位置没有值，则 clone pattern
           let tmp = clone(pattern);
-          tmp[i][j] = color;
+          tmp[i * 3 + j] = color;
           if (check(tmp, color)) {
             return [j, i]; // 位置
           }
@@ -148,28 +146,31 @@
 
     // 对方最差的选择是我方最好的选择
     function bestChoice (pattern, color) {
-      let p;
-      if (p = willWin(pattern, color)) {
+      let point = willWin(pattern, color);
+      if (point) {
         return {
-          point: p,
+          point: point,
           result: 1
         }
       }
-      let result = -2; // -1输 0和 1赢
-      let point = null;
-      for (let i = 0; i < 3; i++) {
+
+      let result = -1; // -1输 0和 1赢
+      outer: for (let i = 0; i < 3; i++) { // outer: 跳出 ouuter 循环
         for (let j = 0; j < 3; j++) {
-          if (pattern[i][j]) {
+          if (pattern[i * 3 + j] !== 0) {
             continue;
           }
           let tmp = clone(pattern);
-          tmp[i][j] = color;
-          let r = bestChoice(tmp, 3 - color).result;
+          tmp[i * 3 + j] = color;
+          let opp = bestChoice(tmp, 3 - color);
 
           // 找到留给对方最差的点 -r
-          if (- r > result) {
-            result = - r
-            point = [j, i]
+          if (-opp.result >= result) {
+            point = [j, i];
+            result = - opp.result;
+          }
+          if (result == 1) {
+            break outer;
           }
         }
       }
@@ -180,7 +181,7 @@
     }
 
     show(pattern);
-    console.log(bestChoice(pattern, color))
+    // console.log(bestChoice(pattern, color))
   </script>
 </body>
 </html>
