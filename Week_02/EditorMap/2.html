@@ -1,0 +1,112 @@
+
+  <style>
+    .cell {
+      display: inline-block;
+      line-height: 7px; /* 防止浏览器的标准模式下 work 异常 */
+      width: 6px;
+      height: 6px;
+      background-color: gray;
+      border-bottom: solid 1px white;
+      border-right: solid 1px white;
+      vertical-align: top;
+    }
+    #container {
+      width: 701px;
+    }
+  </style>
+<body>
+  <div id="container"></div>
+
+  <!-- save 时将内容以 json 格式保存起来 -->
+  <button onclick="localStorage['map'] = JSON.stringify(map)">save</button>
+
+  <script>
+    // Array.fill(value, [start, end]) 填充数组
+    let map = localStorage['map'] ? JSON.parse(localStorage['map']) : Array(100).fill(0);
+    let container = document.getElementById('container');
+
+    for (let y = 0; y < 100; y++) {
+      for (let x = 0; x < 100; x++) {
+        let cell = document.createElement('div');
+        cell.classList.add('cell');
+
+        // map[100 * y + x]: 二维数组转变为一位数组的技巧
+        if (map[100 * y + x] == 1) { // 0: 无阻碍物墙  1: 有阻碍物
+          cell.style.backgroundColor = 'black';
+        }
+
+        cell.addEventListener('mousemove', () => {
+          if (mousedown) { // 鼠标左键 mousedown 建墙
+            if (clear) {
+              cell.style.backgroundColor = '';
+              map[100 * y + x] = 0;
+            } else {
+              cell.style.backgroundColor = 'black';
+              map[100 * y + x] = 1;
+            }
+          }
+        })
+        container.appendChild(cell);
+      }
+    }
+
+    let mousedown = false;
+    let clear = false;
+    document.addEventListener('mousedown', e => {
+      mousedown = true;
+      clear = (e.which === 3) // 按下鼠标右键
+    })
+    document.addEventListener('mouseup', () => mousedown = false );
+    document.addEventListener('contextmenu', e => e.preventDefault() ); // 鼠标右键默认弹出菜单事件禁止掉
+
+    /*
+      寻路问题：
+      1、递归：深度优先搜索（对寻路问题来说不友好）
+      2、寻路：广度优先搜索
+
+      思路：把 start 的 4 个周围的节点全部加入队列(结合图来看)，直到队列变空
+    */
+
+    function path (map, start, end) {
+      /*
+        queue 先进先出：
+        队列: push+shift、pop+unshift
+        栈: push+pop、shift+unshift(一般不用做栈，性能低))
+
+        push: 数组最后一位项添加
+        shift: 删除数组第一项
+        pop: 删除数组最后一项
+        unshift: 数组第一位添加
+      */
+
+      var queue = [start];
+
+      // 入队
+      function insert (x, y) {
+        if (x < 0 || x >= 100 || y < 0 || y >= 100) { // 遇到边儿不入队
+          return;
+        }
+        if (map[y * 100 + x]) { // 遇到墙不入队
+          return;
+        }
+
+        // 找到这个节点时，改变这个节点的状态，以便不再重复查找
+        map[y * 100 + x] = 2;
+        queue.push([x, y])
+      }
+
+      while(queue.length) {
+        let [x, y] = queue.shift();
+        console.log(x, y);
+        if (x === end[0] && y === end[1]) { // 当找到 end 节点
+          return true
+        }
+        insert(x - 1 , y)
+        insert(x , y - 1)
+        insert(x + 1 , y)
+        insert(x , y + 1)
+      }
+      return false;
+    }
+
+  </script>
