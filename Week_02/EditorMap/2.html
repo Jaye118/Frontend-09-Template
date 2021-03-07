@@ -72,7 +72,7 @@
       思路：把 start 的 4 个周围的节点全部加入队列(结合图来看)，直到队列变空
     */
 
-    async function path (map, start, end) {
+    async function findpath (map, start, end) {
       /*
         queue 先进先出：
         队列: push+shift、pop+unshift
@@ -84,35 +84,49 @@
         unshift: 数组第一位添加
       */
 
+      let table = Object.create(map); // 修改 table 的值不会影响 map
       var queue = [start];
 
       // 入队
-      async function insert (x, y) {
+      async function insert (x, y, pre) {
         if (x < 0 || x >= 100 || y < 0 || y >= 100) { // 遇到边儿不入队
           return;
         }
-        if (map[y * 100 + x]) { // 遇到墙不入队
+        if (table[y * 100 + x]) { // 遇到墙不入队
           return;
         }
 
-        await sleep(30)
+        // await sleep(30)
         container.children[y * 100 + x].style.backgroundColor = 'lightgreen'
         // 找到这个节点时，改变这个节点的状态，以便不再重复查找
-        map[y * 100 + x] = 2;
+        table[y * 100 + x] = pre;
         queue.push([x, y])
       }
 
       while(queue.length) {
         let [x, y] = queue.shift();
         if (x === end[0] && y === end[1]) { // 当找到 end 节点
-          return true
+          let path = [];
+
+          while (x != start[0] || y != end[1]) {
+            path.push(map[y * 100 + x]);
+            [x, y] = table[y * 100 + x]; // 解构赋值，table 一直存储前面的节点
+            await sleep(30);
+            container.children[y * 100 + x].style.backgroundColor = 'purple';
+          }
+          return path;
         }
-        await insert(x - 1 , y)
-        await insert(x , y - 1)
-        await insert(x + 1 , y)
-        await insert(x , y + 1)
+        await insert(x - 1, y, [x, y])
+        await insert(x, y - 1, [x, y])
+        await insert(x + 1, y, [x, y])
+        await insert(x, y + 1, [x, y])
+
+        await insert(x - 1, y - 1, [x, y])
+        await insert(x + 1, y - 1, [x, y])
+        await insert(x - 1, y + 1, [x, y])
+        await insert(x + 1, y + 1, [x, y])
       }
-      return false;
+      return null;
     }
 
   </script>
