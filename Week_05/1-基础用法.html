@@ -1,0 +1,17 @@
+<script>
+  let object = {
+    a: 1,
+    b: 2,
+  }
+
+  // 仅在 po 对象里的行为才可以被重新制定
+  let po = new Proxy(object, {
+    set(obj, prop, val) { // 钩子
+      console.log(obj, prop, val)
+    }
+  })
+
+  console.log(po.a = 3)
+  // 输出：{a: 1, b: 2} "a" 3
+
+</script>
