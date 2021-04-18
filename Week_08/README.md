@@ -54,7 +54,7 @@ TCP：
 > libnet：负责构造 IP包并且发送出去
 > labpcap：负责从网卡抓所有的流经网卡的 IP包
 
-#### 2、HTTP
+#### 3、HTTP
 一一对应
 - Request
 - Response
