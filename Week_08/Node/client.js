@@ -1,5 +1,6 @@
 const net = require('net');
 
+// 在 Request 构造器中收集必要的信息
 class Request {
   constructor(options) {
     this.method = options.method || 'GET';
@@ -9,24 +10,30 @@ class Request {
     this.body = options.body || {};
     this.headers = this.headers || {};
 
+    // 以下要处理 Content-Type 和 Content-Length
     if (!this.headers['Content-Type']) {
       this.headers['Content-Type'] = 'application/x-www-form-urlencoded';
     }
     if (this.headers['Content-Type'] === 'application/json') {
       this.bodyText = JSON.stringify(this.body);
     } else if (this.headers['Content-Type'] === 'application/x-www-form-urlencoded') {
-      this.bodyText = Object.keys(this.body).map(key => `${key}=${encodeURIComponent(this.body[key])}`).join('&');
+      this.bodyText = Object.keys(this.body).map(key =>
+        `${key}=${encodeURIComponent(this.body[key])}`
+      ).join('&');
     }
 
     this.headers['Content-Length'] = this.bodyText.length;
   }
 
+  // 把请求数据发送到服务器。异步的，promise
   send(connection) {
     return new Promise((resolve, reject) => {
+      // parser：逐步接收 response，来构建 response 的对象
       const parser = new ResponseParser;
       if (connection) {
         connection.write(this.toString());
       } else {
+        // 创建 TCP 连接
         connection = net.createConnection({
           host: this.host,
           port: this.port
@@ -51,7 +58,7 @@ class Request {
   toString() {
     return `${this.method} ${this.path} HTTP/1.1\r
 ${Object.keys(this.headers).map(key => `${key}: ${this.headers[key]}`).join('\r\n')}\r
-
+\r
 ${this.bodyText}`
   }
 }
@@ -92,10 +99,12 @@ class ResponseParser {
     }
   }
   receive(string) {
+    // 状态机逐个处理
     for (let i = 0; i < string.length; i++) {
-      this.receiveChar(string.chartAt(i));
+      this.receiveChar(string.charAt(i));
     }
   }
+  // receiveChar：状态机代码
   receiveChar(char) {
     if (this.current === this.WAITING_STATUS_LINE) {
       if (char === '\r') {
@@ -104,14 +113,15 @@ class ResponseParser {
         this.statusLine += char;
       }
     } else if (this.current === this.WAITING_STATUS_LINE_END) {
-      if (char === '\n') { // 只能一个 \n
+      if (char === '\n') { // 只等一个 \n
         this.current = this.WAITING_HEADER_NAME;
       }
     } else if (this.current === this.WAITING_HEADER_NAME) {
-      if (chat === ':') {
+      if (char === ':') {
         this.current = this.WAITING_HEADER_SPACE;
       } else if (char === '\r') {
         this.current = this.WAITING_HEADER_BLOCK_END;
+        // header 结束
         if (this.headers['Transfer-Encoding'] === 'chunked') {
           this.bodyParser = new TrunkedBodyParser();
         }
@@ -165,14 +175,14 @@ class TrunkedBodyParser {
         if (this.length === 0) {
           this.isFinished = true;
         }
-        this.current = this.WAITING_LENGTH_LINE_END
+        this.current = this.WAITING_LENGTH_LINE_END;
       } else {
         this.length *= 16; // 十六进制
         this.length += parseInt(char, 16);
       }
 
     } else if (this.current === this.WAITING_LENGTH_LINE_END) {
-      if (chat === '\n') {
+      if (char === '\n') {
         this.current = this.READING_TRUNK;
       }
     } else if (this.current === this.READING_TRUNK) {
@@ -197,15 +207,15 @@ class TrunkedBodyParser {
 
 void async function () {
   let request = new Request({
-    method: 'POST',
-    host: '127.0.0.1',
-    port: '8088',
-    path: '/',
-    headers: {
-      ['X-foo2']: 'customed',
+    method: 'POST', // http协议要求
+    host: '127.0.0.1', // IP协议要求
+    port: '8088', // TCP协议要求
+    path: '/', // http
+    headers: { // http
+      ['X-Foo2']: 'customed',
     },
     body: {
-      name: 'xxx',
+      name: 'Jaye',
     }
   });
 

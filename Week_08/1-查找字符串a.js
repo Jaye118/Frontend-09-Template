@@ -8,5 +8,3 @@ function match (string) {
 }
 
 match('I am groot');
-
-// 在字符串中，找到字符"ab"

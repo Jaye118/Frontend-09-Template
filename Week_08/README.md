@@ -4,8 +4,9 @@
 > 显示在屏幕上一定是图片 Bitmap
 
 #### 渲染过程
-URL--Http--HTML--parse--DOM--css computing--DOM with CSS：带样式的DOM--layout布局/排版--DOM with position 位置/盒--render--Bitmap--操作系统、硬件驱动提供API
+URL -> Http -> HTML -> parse -> DOM -> css computing -> DOM with CSS：带样式的DOM--layout布局/排版 -> DOM with position 位置/盒 -> render -> Bitmap -> 操作系统、硬件驱动提供API
 接口，最终渲染展示页面
+![avatar](./浏览器渲染过程.png)
 
 ### 二、状态机|有限状态机，处理字符串
 #### 1、有限状态机：
@@ -14,7 +15,7 @@ URL--Http--HTML--parse--DOM--css computing--DOM with CSS：带样式的DOM--layo
 - 特点：每个状态都是一个机器（独立的、解耦的）
   - 每个机器里都可以做计算、存储、输出...（只关心本状态机，比如游戏中主角的各种状态）
   - 所有的这些机器接受的输入是一致的
-  - 状态机的每个机器本身没有状态，如果我们用函来表示的话，它应该是纯函数(无副作用)
+  - 状态机的每个机器本身没有状态，如果我们用函数来表示的话，它应该是纯函数(无副作用)
 - 每个机器知道下一个状态
   - 每个机器都有确定 下一个状态（Moore）简单
   - 每个机器根据输入决定下一个状态（Mealy）实用
@@ -22,13 +23,12 @@ URL--Http--HTML--parse--DOM--css computing--DOM with CSS：带样式的DOM--layo
 #### 2、JS 中的有限状态机 Mealy
 ```
 // 每个函数是一个状态
-function state(input) // 函数参数就是输入
-{
+function state(input) { // 函数参数就是输入
   // 在函数中年，可以自由地编写代码，处理每个状态的逻辑
   return next; // 返回值作为下一个状态
 }
 
-/////// 以下是调用 //////
+// 以下是调用
 while(input){
   // 获取输入
   state = state(input); // 把状态机的返回值作为下一个状态
@@ -38,13 +38,15 @@ while(input){
 #### 2、不使用状态机处理字符串
 > 见练习题
 
+
+
 ### 三、HTTP 解析
 #### 1、ISO-OS 七层网络模型
-1. 物理层、数据链路层 == 4G/5G/Wifi
-    - 对数据点对点准确的传输
-2. 网络层 == Internet
+1. 物理层、数据链路层 == 4G/5G/Wifi：对数据点对点准确的传输
+2. 网络层 == Internet  IP  (内网 intranet)
 3. 传输层 == TCP (require('net'))、UDP
-4. 会话、表应用 == hTTP (require('http'))
+4. 会话、表示、应用 == HTTP (require('http'))
+![avatar](./七层网络模型.png)
 
 #### 2、TCP/IP
 TCP：

@@ -13,7 +13,7 @@ function start(c) {
   return start
 }
 
-function end (c){ // trap 陷阱
+function end (){ // trap 陷阱
   return end;
 }
 
@@ -53,5 +53,3 @@ function foundB2 (c) {
 }
 
 console.log(match('abcabcabx'));
-
-

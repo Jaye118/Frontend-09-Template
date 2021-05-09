@@ -2,6 +2,7 @@
 
 function match (string) {
   let foundA = false;
+
   for (let c of string) {
     if (c == 'a') {
       foundA = true;
@@ -11,9 +12,8 @@ function match (string) {
       return true;
     }
   }
+
   return false;
 }
 
 console.log(match('I am groot'));
-
-
