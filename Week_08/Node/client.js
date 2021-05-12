@@ -90,7 +90,7 @@ class ResponseParser {
     return this.bodyParser && this.bodyParser.isFinished;
   }
   get response () {
-    this.statusLine.match(/THHP\/1.1 ([0-9]+) ([\s\S]+)/);
+    this.statusLine.match(/HTTP\/1.1 ([0-9]+) ([\s\S]+)/);
     return {
       statusCode: RegExp.$1,
       statusText: RegExp.$2,
