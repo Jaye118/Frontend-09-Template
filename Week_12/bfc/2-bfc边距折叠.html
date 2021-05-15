@@ -1,0 +1,22 @@
+<div style="
+  width: 100px;
+  height: 100px;
+  background-color: aqua;
+  margin: 20px;
+">
+</div>
+<div style="
+  background-color: pink;
+  margin: 20px;
+  overflow: visible;
+">
+  overflow: visible; --- 3个边距发生折叠在一起
+  hidden：div2 和 子元素创建 BFC，margin 生效，但是 div1 和 div2 仍处于同一个 BFC，仍折叠
+   
+  <div style="
+    width: 100px;
+    height: 100px;
+    background-color: aqua;
+    margin: 20px;
+  "></div>
+</div>
