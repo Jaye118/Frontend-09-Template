@@ -1,4 +1,5 @@
 const net = require('net');
+const parser = require('./parser.js')
 
 // 在 Request 构造器中收集必要的信息
 class Request {
@@ -42,7 +43,7 @@ class Request {
         })
       }
       connection.on('data', (data) => {
-        // console.log(data.toString());
+        console.log(data.toString());
         parser.receive(data.toString());
         if (parser.isFinished) {
           resolve(parser.response);
@@ -220,5 +221,6 @@ void async function () {
   });
 
   let response = await request.send();
-  console.log(response);
+
+  let dom = parser.parseHTML(response.body) // 转成 dom 树
 }();

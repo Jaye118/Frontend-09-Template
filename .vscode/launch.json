@@ -9,7 +9,7 @@
       "type": "node",
       "request": "launch",
       "name": "Launch Program",
-      "program": "${workspaceFolder}/Week_08/Node/client.js"
+      "program": "${workspaceFolder}/Week_09/css-computings/parser.js"
     },
     {
       "type": "node",
