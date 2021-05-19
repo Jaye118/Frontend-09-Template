@@ -16,8 +16,30 @@ function addCSSRules (text) {
   rules.push(...ast.stylesheet.rules);
 }
 
+// 假设此处 selector 都是简单选择器
+// div tagName 选择器 默认
+// .a
+// #a
 function match(element, selector) {
-
+  if (!selector || !element.attributes) { // !element.attributes 是否为文本节点
+    return false
+  }
+  if (selector.charAt(0) == '#') { // charAt() 返回指定位置的字符
+    var attr = element.attrabutes.filter(attr => attr.name === 'id')[0];
+    if (attr && attr.value === selector.replace('#', '')) {
+      return true;
+    }
+  } else if (selector.charAt(0) == '.') {
+    var attr = element.attrabutes.filter(attr => attr.name === 'class')[0];
+    if (attr && attr.value === selector.replace('.', '')) {
+      return true;
+    }
+  } else {
+    if (element.tagName === selector) {
+      return true;
+    }
+  }
+  return false;
 }
 
 function computeCSS (element) {
@@ -53,7 +75,13 @@ function computeCSS (element) {
     }
 
     if (matched) { // 匹配到
-      
+      var computedStyle = element.computedStyle;
+      for (var declaration of rule.declarations) {
+        if (!computedStyle[declaration.property]) {
+          computedStyle[declaration.property] = {};
+          computedStyle[declaration.property].value = declaration.value;
+        }
+      }
     }
   }
 }
