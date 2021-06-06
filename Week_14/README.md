@@ -36,3 +36,6 @@
 3. npm install -save-dev webpack babel-loader
 4. npm install --save-dev @babel/core @babel/preset-env
 5. npm install -save-dev @babel/plugin-transform-react-jsx
+6. npm install webpack-dev-server --save-dev
+7. npm install --save-dev webpack-cli
+
